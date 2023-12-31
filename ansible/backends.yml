@@ -1,0 +1,9 @@
+---
+- hosts: backend_servers
+  remote_user: ubuntu
+  become: yes
+  roles:
+    - backends
+  vars:
+    encrypt: "ZENZNrsXU336Uma+S4XUj9sxvICj32N7XdEzrbYbRpY="
+    consul_server_address: "54.196.226.211"

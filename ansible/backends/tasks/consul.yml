@@ -1,0 +1,37 @@
+---
+# tasks file for backends
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600 # Cache valid for 1 hour
+
+- name: Install Consul
+  apt:
+    name: consul
+    state: latest
+
+- name: Backup existing Consul config
+  command: mv /etc/consul.d/consul.hcl /etc/consul.d/consul.hcl.back
+  args:
+    removes: /etc/consul.d/consul.hcl
+
+- name: Render Consul Configuration Template
+  template:
+    src: config.hcl.j2
+    dest: /etc/consul.d/config.hcl
+  vars:
+    server: "false"
+    datacenter: "dc1"
+
+- name: Render Consul Backend Template
+  template:
+    src: backend.hcl.j2
+    dest: /etc/consul.d/backend.hcl
+
+- name: Start Consul agent
+  shell: nohup consul agent -config-dir /etc/consul.d/ > /dev/null 2>&1 &
+  async: 10
+  poll: 0
+
+- name: consul reload
+  shell: consul reload

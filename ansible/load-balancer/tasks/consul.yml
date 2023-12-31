@@ -1,0 +1,46 @@
+---
+# tasks file for load-balancer
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600 # Cache valid for 1 hour
+
+- name: Install unzip and Nginx
+  apt:
+    name:
+      - unzip
+      - nginx
+    state: latest
+
+- name: Download Consul Template
+  get_url:
+    url: https://releases.hashicorp.com/consul-template/0.30.0/consul-template_0.30.0_linux_amd64.zip
+    dest: /opt/consul-template.zip
+    mode: "0644"
+
+- name: Unzip Consul Template
+  unarchive:
+    src: /opt/consul-template.zip
+    dest: /usr/local/bin/
+    remote_src: yes
+
+- name: Copy file from files directory to destination
+  copy:
+    src: "files/nginx.conf.ctmpl"
+    dest: "/etc/nginx/conf.d/nginx.conf.ctmpl"
+    remote_src: no
+
+- name: Copy Nginx Consul Template
+  template:
+    src: consul-template.hcl.j2
+    dest: /etc/nginx/conf.d/consul-template.hcl
+
+- name: Remove default Nginx site configuration
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Start Consul Template
+  shell: nohup consul-template -config=/etc/nginx/conf.d/consul-template.hcl > /dev/null 2>&1 &
+  async: 10
+  poll: 0

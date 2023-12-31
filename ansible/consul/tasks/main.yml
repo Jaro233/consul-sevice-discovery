@@ -1,0 +1,35 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600 # Cache valid for 1 hour
+
+- name: Install Consul
+  apt:
+    name: consul
+    state: latest
+
+- name: Backup existing Consul config
+  command: mv /etc/consul.d/consul.hcl /etc/consul.d/consul.hcl.back
+  args:
+    removes: /etc/consul.d/consul.hcl
+
+- name: Render Consul Configuration Template
+  template:
+    src: consul.hcl.j2
+    dest: /etc/consul.d/consul.hcl
+  vars:
+    bind_addr: 0.0.0.0
+    client_addr: 0.0.0.0
+    data_dir: /var/consul
+    encrypt: "ZENZNrsXU336Uma+S4XUj9sxvICj32N7XdEzrbYbRpY="
+    datacenter: dc1
+    ui: "true"
+    leave_on_terminate: "true"
+    server: "true"
+    log_level: INFO
+
+- name: Start Consul agent
+  shell: nohup consul agent -dev -config-dir /etc/consul.d/ > /dev/null 2>&1 &
+  async: 10
+  poll: 0

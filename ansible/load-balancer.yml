@@ -1,0 +1,9 @@
+---
+- hosts: load_balancer
+  remote_user: ubuntu
+  become: yes
+
+  roles:
+    - load-balancer
+  vars:
+    consul_server_address: "54.196.226.211:8500"
