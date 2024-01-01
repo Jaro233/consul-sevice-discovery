@@ -32,6 +32,5 @@
   shell: nohup consul agent -config-dir /etc/consul.d/ > /dev/null 2>&1 &
   async: 10
   poll: 0
-
-- name: consul reload
-  shell: consul reload
+# - name: consul reload
+#   shell: consul reload

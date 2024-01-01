@@ -5,11 +5,10 @@
     update_cache: yes
     cache_valid_time: 3600 # Cache valid for 1 hour
 
-- name: Install unzip and Nginx
+- name: Install unzip
   apt:
     name:
       - unzip
-      - nginx
     state: latest
 
 - name: Download Consul Template
@@ -26,8 +25,8 @@
 
 - name: Copy file from files directory to destination
   copy:
-    src: "files/nginx.conf.ctmpl"
-    dest: "/etc/nginx/conf.d/nginx.conf.ctmpl"
+    src: "files/load-balancer.conf.ctmpl"
+    dest: "/etc/nginx/conf.d/load-balancer.conf.ctmpl"
     remote_src: no
 
 - name: Copy Nginx Consul Template
@@ -39,8 +38,8 @@
   file:
     path: /etc/nginx/sites-enabled/default
     state: absent
+  notify:
+    - restart nginx
 
 - name: Start Consul Template
-  shell: nohup consul-template -config=/etc/nginx/conf.d/consul-template.hcl > /dev/null 2>&1 &
-  async: 10
-  poll: 0
+  shell: nohup consul-template -config=/etc/nginx/conf.d/consul-template.hcl &

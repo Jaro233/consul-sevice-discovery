@@ -6,4 +6,4 @@
   roles:
     - load-balancer
   vars:
-    consul_server_address: "54.196.226.211:8500"
+    consul_server_address: "3.90.58.30:8500"

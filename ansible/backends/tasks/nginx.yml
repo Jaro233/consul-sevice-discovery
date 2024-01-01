@@ -19,6 +19,7 @@
     name: nginx
     state: started
     enabled: yes
+
 - name: Restart Nginx service
   systemd:
     name: nginx
